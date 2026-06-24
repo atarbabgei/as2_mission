@@ -1,0 +1,56 @@
+diff --git a/as2_motion_controller/plugins/pid_speed_controller/CMakeLists.txt b/as2_motion_controller/plugins/pid_speed_controller/CMakeLists.txt
+index 260e81b6..3c641cb4 100644
+--- a/as2_motion_controller/plugins/pid_speed_controller/CMakeLists.txt
++++ b/as2_motion_controller/plugins/pid_speed_controller/CMakeLists.txt
+@@ -30,7 +30,11 @@ foreach(DEPENDENCY ${PLUGIN_DEPENDENCIES})
+   find_package(${DEPENDENCY} REQUIRED)
+ endforeach()
+ 
+-# pid_controller: prefer system → local clone → FetchContent.
++# pid_controller: local clone → FetchContent of RPS98/pid_controller.
++# NOTE: we deliberately do NOT use find_package(pid_controller) here. The ROS
++# 'pid_controller' package (from ros2_controllers) collides by name but is an
++# unrelated library and does not provide pid_controller/pid.hpp. Trusting it
++# breaks the build, so we always vendor the RPS98 version.
+ # The local clone lives in plugins/pid_speed_controller/thirdparties/pid_controller/
+ # so it is fetched only the first time and reused on subsequent builds. The
+ # thirdparties/ directory carries an AMENT_IGNORE so colcon never indexes it
+@@ -39,25 +43,20 @@ set(_THIRDPARTIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparties)
+ file(MAKE_DIRECTORY ${_THIRDPARTIES_DIR})
+ file(WRITE ${_THIRDPARTIES_DIR}/AMENT_IGNORE "")
+ 
+-find_package(pid_controller QUIET)
+-if(${pid_controller_FOUND})
+-  message(STATUS "pid_controller found system-wide")
++set(LOCAL_PID_SRC ${_THIRDPARTIES_DIR}/pid_controller)
++if(EXISTS ${LOCAL_PID_SRC}/CMakeLists.txt)
++  message(STATUS "pid_controller: using local clone at ${LOCAL_PID_SRC}")
++  add_subdirectory(${LOCAL_PID_SRC} ${CMAKE_BINARY_DIR}/pid_controller_build)
+ else()
+-  set(LOCAL_PID_SRC ${_THIRDPARTIES_DIR}/pid_controller)
+-  if(EXISTS ${LOCAL_PID_SRC}/CMakeLists.txt)
+-    message(STATUS "pid_controller: using local clone at ${LOCAL_PID_SRC}")
+-    add_subdirectory(${LOCAL_PID_SRC} ${CMAKE_BINARY_DIR}/pid_controller_build)
+-  else()
+-    message(STATUS "pid_controller: cloning into ${LOCAL_PID_SRC}")
+-    include(FetchContent)
+-    fetchcontent_declare(
+-      pid_controller
+-      GIT_REPOSITORY https://github.com/RPS98/pid_controller.git
+-      GIT_TAG v1.0
+-      SOURCE_DIR ${LOCAL_PID_SRC}
+-    )
+-    fetchcontent_makeavailable(pid_controller)
+-  endif()
++  message(STATUS "pid_controller: cloning into ${LOCAL_PID_SRC}")
++  include(FetchContent)
++  fetchcontent_declare(
++    pid_controller
++    GIT_REPOSITORY https://github.com/RPS98/pid_controller.git
++    GIT_TAG v1.0
++    SOURCE_DIR ${LOCAL_PID_SRC}
++  )
++  fetchcontent_makeavailable(pid_controller)
+ endif()
+ 
+ include_directories(

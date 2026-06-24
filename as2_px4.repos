@@ -1,0 +1,21 @@
+# AeroStack2 + PX4 v1.16 stack (vcstool manifest).
+# Pulls everything as2_mission needs, pinned to your validated forks.
+#
+#   mkdir -p ~/as2_ws/src && cd ~/as2_ws
+#   git clone https://github.com/atarbabgei/as2_mission.git src/as2_mission
+#   vcs import src < src/as2_mission/as2_px4.repos
+#   colcon build --symlink-install --packages-up-to as2_mission
+#
+repositories:
+  aerostack2:
+    type: git
+    url: https://github.com/atarbabgei/aerostack2.git
+    version: main
+  as2_platform_pixhawk:
+    type: git
+    url: https://github.com/atarbabgei/as2_platform_pixhawk.git
+    version: main
+  px4_msgs:
+    type: git
+    url: https://github.com/PX4/px4_msgs.git
+    version: release/1.16

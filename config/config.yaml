@@ -1,0 +1,46 @@
+/**:
+  # Global Parameters
+  ros__parameters:
+    tf_timeout_threshold: 0.05
+
+/**:
+  # Platform
+  platform:
+    ros__parameters:
+      max_thrust: 29.0
+      min_thrust: 0.15
+      # external_odom: true   # enable when an onboard computer provides odometry
+
+  # State Estimator
+  state_estimator:
+    ros__parameters:
+      plugin_name: "raw_odometry"   # republishes PX4 odometry as self_localization
+
+  # Behaviors Motion
+  TakeoffBehavior:
+    ros__parameters:
+      takeoff_plugin_name: "takeoff_plugin_position"
+  LandBehavior:
+    ros__parameters:
+      land_plugin_name: "land_plugin_speed"
+  GoToBehavior:
+    ros__parameters:
+      go_to_plugin_name: "go_to_plugin_position"
+  FollowPathBehavior:
+    ros__parameters:
+      follow_path_plugin_name: "follow_path_plugin_position"
+
+  # Trajectory Generation Behavior
+  TrajectoryGeneratorBehavior:
+    ros__parameters:
+      plugin_name: "dynamic_mav_trajectory_generator"
+
+# Per-drone platform settings.
+# IMPORTANT: for native single-drone PX4 SITL the uXRCE-DDS topics are published
+# on the GLOBAL namespace (/fmu/out/...), so fmu_prefix MUST be empty. Only set a
+# prefix (e.g. /drone0) for multi-instance SITL where each PX4 publishes namespaced.
+drone0:
+  platform:
+    ros__parameters:
+      fmu_prefix: ""
+      target_system_id: 1
