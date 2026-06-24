@@ -29,7 +29,6 @@ rosdep install --from-paths src --ignore-src -y -r
 
 # build only what we need — no Gazebo/sim packages
 colcon build \
-  --symlink-install \
   --packages-select \
     as2_msgs \
     as2_core \
