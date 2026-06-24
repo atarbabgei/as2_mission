@@ -30,6 +30,18 @@ rosdep install --from-paths src --ignore-src -y -r
 colcon build --symlink-install --packages-up-to as2_mission   # skips Gazebo/sim packages
 ```
 
+### Low-RAM devices (e.g. Raspberry Pi)
+Building the stack is memory-hungry and can be killed by the OOM reaper on devices
+with limited RAM. Enable swap before building:
+```bash
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h   # should show ~4G swap
+```
+
 ## Dependencies (the patched stack this assumes)
 This package needs an AeroStack2 + Pixhawk stack ported to **px4_msgs 1.16**. The
 forks below pin a validated commit; the pid build fix is already committed in the
