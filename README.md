@@ -42,8 +42,15 @@ git clone https://github.com/atarbabgei/as2_platform_pixhawk.git
 git clone https://github.com/atarbabgei/as2_mission.git
 git clone -b release/1.16 https://github.com/PX4/px4_msgs.git
 cd ~/as2_ws && source /opt/ros/humble/setup.bash
+
+# install system deps declared in every package.xml (image_transport, cv_bridge, tf2, ...)
+sudo apt update && rosdep update
+rosdep install --from-paths src --ignore-src -y -r
+
 colcon build --symlink-install --packages-up-to as2_mission   # skips Gazebo/sim packages
 ```
+On a fresh machine, skipping `rosdep install` causes `find_package` errors like
+`Could not find ... "image_transport"` — those are missing system deps, not code bugs.
 `px4_msgs` (branch `release/1.16`) must match the PX4 v1.16 firmware — don't skip it.
 (An `as2_px4.repos` manifest is also included if you prefer `vcs import`.)
 
