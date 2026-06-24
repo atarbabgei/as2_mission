@@ -27,7 +27,21 @@ cd ~/as2_ws && source /opt/ros/humble/setup.bash
 sudo apt update && rosdep update
 rosdep install --from-paths src --ignore-src -y -r
 
-colcon build --symlink-install --packages-up-to as2_mission   # skips Gazebo/sim packages
+# build only what we need — no Gazebo/sim packages
+colcon build \
+  --symlink-install \
+  --packages-select \
+    as2_msgs \
+    as2_core \
+    as2_behavior \
+    as2_motion_reference_handlers \
+    as2_state_estimator \
+    as2_motion_controller \
+    as2_behaviors_motion \
+    as2_behaviors_trajectory_generation \
+    as2_platform_pixhawk \
+    as2_python_api \
+    as2_mission
 ```
 
 ### Low-RAM devices (e.g. Raspberry Pi)
