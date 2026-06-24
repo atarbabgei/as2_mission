@@ -12,6 +12,24 @@ ros2 launch as2_mission as2_bringup.launch.py namespace:=drone0
 ros2 launch as2_mission mission.launch.py namespace:=drone0
 ```
 
+## Installation
+AeroStack2 keeps platform drivers (pixhawk, dji, crazyflie...) in separate repos, so
+clone the four pieces into one workspace's `src/`:
+```bash
+mkdir -p ~/as2_ws/src && cd ~/as2_ws/src
+git clone https://github.com/atarbabgei/aerostack2.git
+git clone https://github.com/atarbabgei/as2_platform_pixhawk.git
+git clone https://github.com/atarbabgei/as2_mission.git
+git clone -b release/1.16 https://github.com/PX4/px4_msgs.git
+cd ~/as2_ws && source /opt/ros/humble/setup.bash
+
+# install system deps declared in every package.xml (image_transport, cv_bridge, tf2, ...)
+sudo apt update && rosdep update
+rosdep install --from-paths src --ignore-src -y -r
+
+colcon build --symlink-install --packages-up-to as2_mission   # skips Gazebo/sim packages
+```
+
 ## Dependencies (the patched stack this assumes)
 This package needs an AeroStack2 + Pixhawk stack ported to **px4_msgs 1.16**. The
 forks below pin a validated commit; the pid build fix is already committed in the
@@ -31,28 +49,6 @@ aerostack2 fork, so no manual patching is needed.
 3. **px4_msgs** branch `release/1.16` (must match the PX4 v1.16 firmware).
 
 4. **Micro-XRCE-DDS-Agent** (SITL: UDP `:8888`; real Pixhawk: serial).
-
-## Get the whole stack
-AeroStack2 keeps platform drivers (pixhawk, dji, crazyflie...) in separate repos, so
-clone the four pieces into one workspace's `src/`:
-```bash
-mkdir -p ~/as2_ws/src && cd ~/as2_ws/src
-git clone https://github.com/atarbabgei/aerostack2.git
-git clone https://github.com/atarbabgei/as2_platform_pixhawk.git
-git clone https://github.com/atarbabgei/as2_mission.git
-git clone -b release/1.16 https://github.com/PX4/px4_msgs.git
-cd ~/as2_ws && source /opt/ros/humble/setup.bash
-
-# install system deps declared in every package.xml (image_transport, cv_bridge, tf2, ...)
-sudo apt update && rosdep update
-rosdep install --from-paths src --ignore-src -y -r
-
-colcon build --symlink-install --packages-up-to as2_mission   # skips Gazebo/sim packages
-```
-On a fresh machine, skipping `rosdep install` causes `find_package` errors like
-`Could not find ... "image_transport"` — those are missing system deps, not code bugs.
-`px4_msgs` (branch `release/1.16`) must match the PX4 v1.16 firmware — don't skip it.
-(An `as2_px4.repos` manifest is also included if you prefer `vcs import`.)
 
 ## Config
 `config/config.yaml` — `fmu_prefix: ""` (single-drone, PX4 publishes global `/fmu/...`).
